@@ -1,0 +1,14 @@
+# Keep binary deliverables out of diffs
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.mp4 binary
+*.mov binary
+*.pdf binary
+
+# Normalise text
+*.md   text eol=lf
+*.txt  text eol=lf
+*.sh   text eol=lf
+*.svg  text eol=lf

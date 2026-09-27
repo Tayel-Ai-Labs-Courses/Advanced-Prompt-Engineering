@@ -1,0 +1,27 @@
+# OS noise
+.DS_Store
+Thumbs.db
+._*
+.Spotlight-V100
+.Trashes
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Archives
+*.zip
+*.rar
+*.7z
+*.tar.gz
+
+# Scratch
+tmp/
+temp/
+*.tmp
+
+# Secrets — never commit an API key
+.env
+*.key
+secrets.*
