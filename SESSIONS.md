@@ -62,12 +62,21 @@ sentence offer they could sell.
 
 **Do live:** walk through the five business shapes and the moat diagram in
 [Lesson 14](lessons/14-prompt-engineering-as-a-business.md). Do weak-vs-good pair
-14 (the pitch). Then each attendee presents their workflow + eval score.
+14 (the pitch). Then launch the **capstone** below.
+
+**Capstone (the main event):** build a complete clothing store web app —
+including an AI shopping assistant — entirely by prompting Claude, step by step.
+Full guide with the exact prompts and the principle behind each one:
+[`capstone-clothing-store.md`](capstone-clothing-store.md). It ties the *whole
+course* together: every build step is a prompt using the six components,
+structured output, grounding, chaining, guardrails, evaluation, and security.
+Do as much as time allows live; the rest is the take-home.
 
 **Task (capstone):**
-> Write your one-sentence offer: *"For [niche], I build [workflow] that
-> [outcome], proven by [your eval], priced at [setup + monthly]."* Fill every
-> blank. The blank you can't fill is the lesson to revisit.
+> Finish the clothing-store capstone, then write your one-sentence offer: *"For
+> [niche], I build [workflow] that [outcome], proven by [your eval], priced at
+> [setup + monthly]."* Fill every blank. The blank you can't fill is the lesson
+> to revisit.
 
 ---
 
@@ -83,7 +92,7 @@ flowchart LR
 |---|---|---|
 | 1 | 00–07 | Rewrite one real prompt with all six components + a guardrail |
 | 2 | 08–13 | Build a 10-input eval set + survive one injection attack |
-| 3 | 14 | Present the workflow + write a sellable one-sentence offer |
+| 3 | 14 | Build the clothing-store capstone + write a sellable one-sentence offer |
 
 **Pacing note:** Session 1 is the heaviest (8 lessons) but all light and no-code —
 it moves fast. Session 2 is the deepest — don't rush the eval and security parts,
