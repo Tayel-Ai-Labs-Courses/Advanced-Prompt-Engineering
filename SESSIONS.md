@@ -21,7 +21,12 @@ structured output, guardrails)
 
 **Do live:** open [`examples/weak-vs-good.md`](examples/weak-vs-good.md) and walk
 through pairs 1–7 together. For each, let them guess what's missing before you
-show the good version.
+show the good version. A ready-made slide deck for this session (Lessons 00–04,
+with the diagrams and the assignment) is at
+[`presentations/session-1-foundations.pdf`](presentations/session-1-foundations.pdf)
+— every slide links to the full lesson.
+
+**Assignment:** [`assignments/session-1-foundations.md`](assignments/session-1-foundations.md).
 
 **Task (bring to Session 2):**
 > Pick one real prompt you use. Rewrite it using the six components
