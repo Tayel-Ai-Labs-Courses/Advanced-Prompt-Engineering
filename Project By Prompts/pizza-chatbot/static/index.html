@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>بيتزا بلانيت — اطلب أونلاين</title>
+<style>
+  :root{
+    --red:#c8102e; --dark:#1d1d1f; --cream:#fdf8f3;
+    --bot:#f1f1f3; --me:#c8102e; --line:rgba(0,0,0,.08);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:-apple-system,"Segoe UI",Tahoma,sans-serif;
+    background:var(--cream); color:var(--dark); min-height:100vh;
+  }
+
+  /* --- the fake restaurant page behind the widget --- */
+  .hero{
+    background:var(--dark); color:#fff; padding:56px 24px; text-align:center;
+  }
+  .hero h1{margin:0 0 8px; font-size:34px; letter-spacing:-.5px}
+  .hero p{margin:0; opacity:.7}
+  .hero .strip{height:4px;background:linear-gradient(90deg,var(--red),#f0a500 50%,#2b7a3d);margin:-56px -24px 40px;}
+  .cards{
+    max-width:900px; margin:-28px auto 0; padding:0 20px 80px;
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px;
+  }
+  .card{
+    background:#fff; border:1px solid var(--line); border-radius:14px;
+    padding:20px; box-shadow:0 4px 18px rgba(0,0,0,.04);
+  }
+  .card h3{margin:0 0 6px; font-size:17px}
+  .card span{color:var(--red); font-weight:700}
+  .card small{color:#666; display:block; margin-top:4px}
+
+  /* --- chat launcher --- */
+  .launcher{
+    position:fixed; bottom:24px; left:24px; z-index:50;
+    width:62px; height:62px; border-radius:50%; border:0; cursor:pointer;
+    background:var(--red); color:#fff; font-size:26px;
+    box-shadow:0 8px 24px rgba(200,16,46,.4);
+    transition:transform .2s;
+  }
+  .launcher:hover{transform:scale(1.07)}
+
+  /* --- the widget --- */
+  .widget{
+    position:fixed; bottom:98px; left:24px; z-index:60;
+    width:min(380px, calc(100vw - 32px)); height:min(560px, calc(100vh - 140px));
+    background:#fff; border-radius:18px; overflow:hidden;
+    display:none; flex-direction:column;
+    box-shadow:0 20px 60px rgba(0,0,0,.22);
+  }
+  .widget.open{display:flex}
+  .widget header{
+    background:var(--dark); color:#fff; padding:14px 16px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .widget header .avatar{
+    width:34px;height:34px;border-radius:50%;background:var(--red);
+    display:grid;place-items:center;font-size:17px;
+  }
+  .widget header b{font-size:15px; display:block}
+  .widget header em{font-size:11.5px; opacity:.65; font-style:normal}
+  .widget header .dbg{
+    margin-inline-start:auto; background:transparent; border:1px solid rgba(255,255,255,.3);
+    color:#fff; border-radius:7px; font-size:11px; padding:4px 8px; cursor:pointer;
+  }
+
+  .log{flex:1; overflow-y:auto; padding:16px; background:#fafafa}
+  .msg{margin-bottom:12px; display:flex}
+  .msg .bubble{
+    max-width:84%; padding:10px 13px; border-radius:15px; font-size:14px;
+    line-height:1.65; white-space:pre-wrap; word-wrap:break-word;
+  }
+  .msg.bot .bubble{background:var(--bot); border-bottom-right-radius:5px}
+  .msg.me{justify-content:flex-end}
+  .msg.me .bubble{background:var(--me); color:#fff; border-bottom-left-radius:5px}
+
+  .typing .bubble{background:var(--bot); display:flex; gap:4px; padding:13px}
+  .typing i{width:7px;height:7px;border-radius:50%;background:#aaa;animation:b 1.2s infinite}
+  .typing i:nth-child(2){animation-delay:.2s}
+  .typing i:nth-child(3){animation-delay:.4s}
+  @keyframes b{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+
+  .chips{display:flex; flex-wrap:wrap; gap:6px; padding:0 16px 10px; background:#fafafa}
+  .chips button{
+    background:#fff; border:1px solid var(--red); color:var(--red);
+    border-radius:20px; padding:6px 12px; font-size:12.5px; cursor:pointer;
+    font-family:inherit;
+  }
+  .chips button:hover{background:var(--red); color:#fff}
+
+  .composer{display:flex; gap:8px; padding:10px; border-top:1px solid var(--line); background:#fff}
+  .composer input{
+    flex:1; border:1px solid var(--line); border-radius:22px; padding:11px 15px;
+    font-size:14px; font-family:inherit; outline:none;
+  }
+  .composer input:focus{border-color:var(--red)}
+  .composer button{
+    width:42px;height:42px;border:0;border-radius:50%;background:var(--red);
+    color:#fff;font-size:17px;cursor:pointer;
+  }
+
+  /* --- the teaching panel: shows what the NLP engine understood --- */
+  .debug{
+    display:none; background:#1d1d1f; color:#8ef0a8; font-size:11px;
+    font-family:ui-monospace,Menlo,monospace; padding:10px 12px;
+    max-height:150px; overflow:auto; direction:ltr; text-align:left;
+    white-space:pre-wrap; border-top:2px solid var(--red);
+  }
+  .debug.on{display:block}
+</style>
+</head>
+<body>
+
+  <div class="hero">
+    <div class="strip"></div>
+    <h1>🍕 بيتزا بلانيت</h1>
+    <p>طازة من الفرن — توصيل خلال 30 دقيقة</p>
+  </div>
+
+  <div class="cards">
+    <div class="card"><h3>مارجريتا</h3><span>من 90 ج</span><small>صوص طماطم وموتزاريلا</small></div>
+    <div class="card"><h3>بيبروني</h3><span>من 110 ج</span><small>الأكثر طلباً 🔥</small></div>
+    <div class="card"><h3>تشيكن رانش</h3><span>من 120 ج</span><small>فراخ مشوية وصوص رانش</small></div>
+    <div class="card"><h3>أربع أجبان</h3><span>من 125 ج</span><small>أربع أنواع جبن</small></div>
+  </div>
+
+  <button class="launcher" id="launcher" title="اتكلم معانا">💬</button>
+
+  <div class="widget" id="widget">
+    <header>
+      <div class="avatar">🍕</div>
+      <div>
+        <b>مساعد بيتزا بلانيت</b>
+        <em>● متصل الآن</em>
+      </div>
+      <button class="dbg" id="dbgBtn">🧠 التحليل</button>
+    </header>
+
+    <div class="log" id="log"></div>
+    <div class="chips" id="chips"></div>
+    <div class="debug" id="debug"></div>
+
+    <form class="composer" id="composer">
+      <input id="input" placeholder="اكتب رسالتك..." autocomplete="off">
+      <button type="submit">↑</button>
+    </form>
+  </div>
+
+<script>
+// The frontend is deliberately dumb. It has no idea what a pizza is, what an
+// intent is, or how much anything costs. It sends text to /chat and renders
+// whatever comes back. All the thinking lives on the server.
+
+const log = document.getElementById('log');
+const chipsBox = document.getElementById('chips');
+const debugBox = document.getElementById('debug');
+const input = document.getElementById('input');
+
+// Identifies this browser's conversation so the server can keep its slots.
+let sessionId = localStorage.getItem('pizza_session') || crypto.randomUUID();
+localStorage.setItem('pizza_session', sessionId);
+
+function bubble(text, who){
+  const row = document.createElement('div');
+  row.className = 'msg ' + who;
+  const b = document.createElement('div');
+  b.className = 'bubble';
+  b.textContent = text;
+  row.appendChild(b);
+  log.appendChild(row);
+  log.scrollTop = log.scrollHeight;
+  return row;
+}
+
+function showTyping(){
+  const row = document.createElement('div');
+  row.className = 'msg bot typing';
+  row.innerHTML = '<div class="bubble"><i></i><i></i><i></i></div>';
+  log.appendChild(row);
+  log.scrollTop = log.scrollHeight;
+  return row;
+}
+
+function renderChips(list){
+  chipsBox.innerHTML = '';
+  (list || []).forEach(label => {
+    const b = document.createElement('button');
+    b.textContent = label;
+    b.onclick = () => send(label);
+    chipsBox.appendChild(b);
+  });
+}
+
+async function send(message){
+  if (message) { bubble(message, 'me'); }
+  renderChips([]);
+  input.value = '';
+  const typing = showTyping();
+
+  let data;
+  try {
+    const res = await fetch('/chat', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({session_id: sessionId, message: message || ''})
+    });
+    data = await res.json();
+  } catch (e) {
+    typing.remove();
+    bubble('في مشكلة في الاتصال بالسيرفر 😕', 'bot');
+    return;
+  }
+
+  // A short pause so the typing dots are actually visible -- it reads as a
+  // reply being written instead of text teleporting in.
+  await new Promise(r => setTimeout(r, 350));
+  typing.remove();
+
+  sessionId = data.session_id;
+  localStorage.setItem('pizza_session', sessionId);
+  bubble(data.reply, 'bot');
+  renderChips(data.chips);
+
+  if (data.debug) {
+    debugBox.textContent =
+      'intent      : ' + data.debug.intent + '\n' +
+      'confidence  : ' + data.debug.confidence + '\n' +
+      'entities    : ' + JSON.stringify(data.debug.entities) + '\n' +
+      'slots filled: ' + JSON.stringify(data.debug.slots) + '\n' +
+      'stage       : ' + data.debug.stage + '\n' +
+      'asking for  : ' + (data.debug.pending || '-');
+  }
+}
+
+document.getElementById('composer').onsubmit = e => {
+  e.preventDefault();
+  const text = input.value.trim();
+  if (text) send(text);
+};
+
+document.getElementById('dbgBtn').onclick = () => debugBox.classList.toggle('on');
+
+document.getElementById('launcher').onclick = () => {
+  const w = document.getElementById('widget');
+  w.classList.toggle('open');
+  if (w.classList.contains('open') && !log.children.length) {
+    send('');          // empty message = "I just opened the chat", bot greets
+  }
+  if (w.classList.contains('open')) input.focus();
+};
+</script>
+</body>
+</html>
